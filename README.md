@@ -13,6 +13,15 @@ what the underlying `enl/flysystem-cloudinary` module is doing).
 store all files. **Any locally stored files will not be accessible** (though their database records will remain).
 
 ## Installation
+* Add the following to your `composer.json`:
+  ```
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "git@github.com:madmatt/silverstripe-cloudinary.git"
+    }
+  ],
+  ```
 * `composer require madmatt/silverstripe-cloudinary`
 * This module requires the following environment variables to be defined, either in .env or via server environment vars:
 
