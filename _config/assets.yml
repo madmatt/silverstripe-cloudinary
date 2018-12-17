@@ -1,0 +1,50 @@
+---
+Name: cloudinary-flysystem
+Only:
+  envvarset: CLOUDINARY_CLOUD_NAME
+After:
+  - '#assetsflysystem'
+---
+SilverStripe\Core\Injector\Injector:
+  # Configure the API facade that sits atop the Cloudinary API library
+  Enl\Flysystem\Cloudinary\ApiFacade:
+    constructor:
+      configuration:
+        cloud_name: '`CLOUDINARY_CLOUD_NAME`'
+        api_key: '`CLOUDINARY_API_KEY`'
+        api_secret: '`CLOUDINARY_API_SECRET`'
+        overwrite: false
+  # Configure SilverStripe to use the Cloudinary Flysystem adapter for public assets
+  SilverStripe\Assets\Flysystem\PublicAdapter:
+    class: Madmatt\Cloudinary\CloudinaryAdapter
+    constructor:
+      configuration:
+        '%$Enl\Flysystem\Cloudinary\ApiFacade'
+  # Configure SilverStripe to use the Cloudinary Flysystem adapter for protected assets
+  SilverStripe\Assets\Flysystem\ProtectedAdapter:
+    class: Madmatt\Cloudinary\CloudinaryAdapter
+    constructor:
+      configuration:
+        '%$Enl\Flysystem\Cloudinary\ApiFacade'
+
+  # Define the default filesystem
+  League\Flysystem\Filesystem.public:
+    class: League\Flysystem\Filesystem
+    constructor:
+      FilesystemAdapter: '%$SilverStripe\Assets\Flysystem\PublicAdapter'
+      FilesystemConfig:
+        visibility: public
+  # Define the secondary filesystem for protected assets
+  League\Flysystem\Filesystem.protected:
+    class: League\Flysystem\Filesystem
+    constructor:
+      FilesystemAdapter: '%$SilverStripe\Assets\Flysystem\ProtectedAdapter'
+      FilesystemConfig:
+        visibility: private
+
+# Ensure we use links and not inline thumbnails for all Cloudinary assets
+SilverStripe\AssetAdmin\Model\ThumbnailGenerator:
+  thumbnail_links:
+    protected: url
+    public: url
+
